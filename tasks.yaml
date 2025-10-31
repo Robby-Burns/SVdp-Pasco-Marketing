@@ -1,0 +1,107 @@
+---
+retrieve_optimal_story_from_excel_database:
+  description: Read the Excel/CSV story database file and select the most suitable
+    unused story for {audience_mix} preferences (weighted toward donors and volunteers).
+    Filter stories by target audience, usage status, and content type. If the file
+    is empty or lacks suitable stories, search the web for authentic Saint Vincent
+    de Paul stories from credible sources. Mark selected story to prevent duplication
+    in future campaigns.
+  expected_output: 'A detailed story object with metadata including: story text, story
+    source (Excel file vs. web), story type (donor/volunteer/beneficiary), target
+    audience alignment score, unique story ID, usage status, and source URL if web-scraped.
+    Include file path and row number if from Excel, or scraping timestamp and original
+    URL if from web.'
+  agent: story_database_manager
+research_high_performance_content_patterns:
+  description: 'Before creating new content, research and analyze past performance
+    data to identify what content characteristics, story types, messaging approaches,
+    and formats have generated the highest engagement with {audience_mix}. Look for
+    patterns in successful posts including: story themes that resonate, optimal post
+    length, effective call-to-actions, hashtag performance, and engagement timing.
+    Extract actionable insights to inform the new content creation.'
+  expected_output: 'A performance insights report detailing: top-performing story
+    themes, most effective messaging approaches for {audience_mix}, optimal content
+    formats and lengths, successful call-to-action patterns, and specific recommendations
+    for creating content similar to past high-performers'
+  agent: content_creator
+  context:
+  - retrieve_optimal_story_from_excel_database
+generate_facebook_content:
+  description: Create an engaging Facebook post using the selected story that follows
+    St. Vincent de Paul brand guidelines. Use Vincentian Blue theme, appropriate terminology
+    ("neighbors in need"), and craft messaging that appeals to {audience_mix} with
+    weighted focus on donors and volunteers. Include clear call-to-action, relevant
+    hashtags, and optimal length for Facebook engagement. Ensure content is accessible
+    and appealing to seniors.
+  expected_output: 'A complete Facebook post with: main text (150-200 words), call-to-action,
+    relevant hashtags (#StVincentdePaul, #CommunityService, #PascoCares), and formatting
+    that reflects brand guidelines'
+  agent: content_creator
+  context:
+  - retrieve_optimal_story_from_excel_database
+  - research_high_performance_content_patterns
+generate_blog_content:
+  description: 'Create a comprehensive blog post using the selected story for the
+    Squarespace blog. Follow St. Vincent de Paul brand guidelines with Century Gothic
+    headers, proper terminology, and structure that includes: compelling headline,
+    story narrative, impact details, volunteer/donation opportunities, and call-to-action.
+    Optimize for {audience_mix} with focus on donors and volunteers. Ensure content
+    is SEO-friendly and accessible.'
+  expected_output: 'A complete blog post with: SEO-optimized headline, 400-600 word
+    article body with proper formatting, subheaders using Century Gothic style, embedded
+    story narrative, community impact section, and clear call-to-action for volunteers
+    and donors'
+  agent: content_creator
+  context:
+  - retrieve_optimal_story_from_excel_database
+  - research_high_performance_content_patterns
+brand_compliance_review:
+  description: 'Review both Facebook and blog content for strict adherence to St.
+    Vincent de Paul brand guidelines. Verify proper use of: Vincentian Blue color
+    references, Century Gothic/Arial typography mentions, appropriate terminology
+    ("neighbors in need" not "poverty stricken"), gratitude-focused language, accessibility
+    for seniors, and overall tone alignment with organizational values. Flag any issues
+    and provide specific correction recommendations.'
+  expected_output: 'A comprehensive compliance report detailing: brand guideline adherence
+    score, specific issues found (if any), recommendations for improvements, and final
+    approval status for both Facebook and blog content pieces'
+  agent: brand_compliance_officer
+  context:
+  - generate_facebook_content
+  - generate_blog_content
+send_approval_request:
+  description: Compose and send a professional approval email to rob200@pitt.edu containing
+    both Facebook and blog content formatted for easy review. Include content previews,
+    brand compliance summary, publication timeline, and clear approval/rejection response
+    options. Provide instructions for providing feedback if changes are needed.
+  expected_output: Confirmation of sent approval email with formatted content previews,
+    tracking information, and established workflow for processing responses and feedback
+    from the approver
+  agent: approval_manager
+  context:
+  - brand_compliance_review
+publish_approved_content:
+  description: Upon receiving approval, publish the Facebook post and blog content
+    to their respective platforms. Schedule Facebook post for optimal Tuesday timing
+    for senior engagement. Upload blog post to Squarespace with proper formatting,
+    SEO optimization, and category tagging. Confirm successful publication and document
+    posting details including timestamps and URLs.
+  expected_output: 'Publication confirmation report including: Facebook post URL and
+    engagement metrics baseline, Squarespace blog post URL and publication details,
+    optimal posting time used, and initial tracking setup for performance monitoring'
+  agent: publishing_coordinator
+  context:
+  - send_approval_request
+track_performance_and_store_in_pinecone:
+  description: Monitor published content performance by scraping Facebook and blog
+    analytics when available. Collect basic engagement indicators and prepare structured
+    performance data for future Pinecone integration. Focus on documenting story characteristics,
+    content type, and audience response patterns that can be vectorized once Pinecone
+    tool is available. Generate performance insights for content optimization.
+  expected_output: 'Performance analysis report with: available engagement metrics
+    from web scraping, story performance categorization, content characteristics documentation,
+    and structured data prepared for Pinecone storage. Include actionable insights
+    for future story selection and content optimization based on observable patterns.'
+  agent: performance_analytics_manager
+  context:
+  - publish_approved_content
